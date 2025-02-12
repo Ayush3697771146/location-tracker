@@ -1,59 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Location Tracker</title>
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(sendLocation, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
         }
+    }
 
-        function showPosition(position) {
-            let latitude = position.coords.latitude;
-            let longitude = position.coords.longitude;
-            let accuracy = position.coords.accuracy;
+    function sendLocation(position) {
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+        let accuracy = position.coords.accuracy;
 
-            // Show the location on screen
-            document.getElementById("location").innerHTML = 
-                "Latitude: " + latitude + "<br>Longitude: " + longitude + 
-                "<br>Accuracy: " + accuracy + " meters";
+        // Google Form URL (replace with your own form URL)
+        let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSfc3LJEhqh3dbSqUKw-2aE138piFREpAHoM7MWMX_3OGa3wyQ/formResponse";
 
-            // Send location data to a Google Form (Alternative to a server)
-            let googleFormURL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
-            fetch(googleFormURL, {
-                method: "POST",
-                mode: "no-cors",
-                body: new URLSearchParams({
-                    "entry.YOUR_LAT_FIELD_ID": latitude,
-                    "entry.YOUR_LON_FIELD_ID": longitude,
-                    "entry.YOUR_ACC_FIELD_ID": accuracy
-                })
-            });
-        }
+        // Sending data to Google Forms
+        fetch(formURL, {
+            method: "POST",
+            mode: "no-cors",
+            body: new URLSearchParams({
+                "entry.LAT_ENTRY_ID": latitude,   // Replace with Latitude entry ID
+                "entry.LON_ENTRY_ID": longitude,  // Replace with Longitude entry ID
+                "entry.ACC_ENTRY_ID": accuracy    // Replace with Accuracy entry ID
+            })
+        });
 
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    alert("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("An unknown error occurred.");
-                    break;
-            }
-        }
-    </script>
-</head>
-<body onload="getLocation()">
-    <h1>Getting Location...</h1>
-    <p id="location"></p>
-</body>
-</html>
+        alert("Location Sent Successfully!");
+    }
+
+    function showError(error) {
+        alert("Error getting location: " + error.message);
+    }
+</script>
